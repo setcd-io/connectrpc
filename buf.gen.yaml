@@ -1,0 +1,11 @@
+version: v2
+plugins:
+  # - remote: buf.build/bufbuild/connect-go
+  #   out: client
+  #   opt:
+  #     - paths=source_relative
+  - local: protoc-gen-es
+    out: src
+    # Also generate any imported dependencies
+    include_imports: true
+    opt: target=ts

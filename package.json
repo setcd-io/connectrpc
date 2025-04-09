@@ -1,0 +1,40 @@
+{
+  "name": "@setcd-io/proto",
+  "version": "3.5.21-0",
+  "description": "protobuf definitions for etcd",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "scripts": {
+    "build:proto": "buf generate --exclude-path etcd/api/etcdserverpb/raft_internal.proto",
+    "build:index": "tsup src/index.ts --dts --sourcemap inline",
+    "build": "npm run build:proto && npm run build:index"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/setcd-io/proto.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/setcd-io/proto/issues"
+  },
+  "homepage": "https://github.com/setcd-io/proto#readme",
+  "dependencies": {
+    "@bufbuild/protobuf": "^2.2.5"
+  },
+  "devDependencies": {
+    "@bufbuild/buf": "^1.52.1",
+    "@bufbuild/protoc-gen-es": "^2.2.5",
+    "@connectrpc/connect": "^2.0.2",
+    "tsup": "^8.4.0",
+    "tsx": "^4.19.3",
+    "typescript": "^5.8.3"
+  }
+}
