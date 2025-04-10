@@ -1,7 +1,7 @@
 {
-  "name": "@setcd-io/proto",
+  "name": "@setcd-io/connectrpc",
   "version": "3.5.21-0",
-  "description": "protobuf definitions for etcd",
+  "description": "ConnectRPC Bindings for Etcd Client/Server",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
@@ -13,26 +13,27 @@
     "node": ">=18.0.0"
   },
   "scripts": {
+    "prepare": "husky",
     "build:proto": "buf generate --exclude-path etcd/api/etcdserverpb/raft_internal.proto",
     "build:index": "tsup src/index.ts --dts --sourcemap inline",
     "build": "npm run build:proto && npm run build:index"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/setcd-io/proto.git"
+    "url": "git+https://github.com/setcd-io/connectrpc.git"
   },
-  "author": "",
+  "author": "Christian Nuss <github.com/cnuss>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/setcd-io/proto/issues"
+    "url": "https://github.com/setcd-io/connectrpc/issues"
   },
-  "homepage": "https://github.com/setcd-io/proto#readme",
-  "dependencies": {},
+  "homepage": "https://github.com/setcd-io/connectrpc#README.md",
   "devDependencies": {
     "@bufbuild/buf": "^1.52.1",
     "@bufbuild/protobuf": "^2.2.5",
     "@bufbuild/protoc-gen-es": "^2.2.5",
     "@connectrpc/connect": "^2.0.2",
+    "husky": "^9.1.7",
     "tsup": "^8.4.0",
     "tsx": "^4.19.3",
     "typescript": "^5.8.3"
