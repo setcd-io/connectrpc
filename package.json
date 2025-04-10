@@ -1,7 +1,7 @@
 {
-  "name": "@setcd-io/connectrpc",
+  "name": "@setcd-io/connectrpc-etcd",
   "version": "3.5.21-0",
-  "description": "ConnectRPC Bindings for Etcd Client/Server",
+  "description": "Protobuf Bindings using ConnectRPC for Etcd Client/Server",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
@@ -20,14 +20,18 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/setcd-io/connectrpc.git"
+    "url": "git+https://github.com/setcd-io/connectrpc-etcd.git"
   },
   "author": "Christian Nuss <github.com/cnuss>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/setcd-io/connectrpc/issues"
+    "url": "https://github.com/setcd-io/connectrpc-etcd/issues"
   },
-  "homepage": "https://github.com/setcd-io/connectrpc#README.md",
+  "homepage": "https://github.com/setcd-io/connectrpc-etcd#README.md",
+  "peerDependencies": {
+    "@bufbuild/protobuf": "*",
+    "@connectrpc/connect": "*"
+  },
   "devDependencies": {
     "@bufbuild/buf": "^1.52.1",
     "@bufbuild/protobuf": "^2.2.5",
