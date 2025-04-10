@@ -20,6 +20,14 @@ Coming Soon
 - A pinned version of `etcd` is pulled in as a `.gitmodule`
 - The `version` in `package.json` matches `major.minor.patch` version of `etcd`.
 
+1. Run the following commands:
+
+   ```
+   git submodule update --init --recursive
+   npm install
+   npm run build
+   ```
+
 ### Updating to a new version of `etcd`
 
 1. Run the following commands:
@@ -39,3 +47,7 @@ Coming Soon
    git commit -m "Update to etcd v3.5.21"
    git push
    ```
+
+# License
+
+`connectrpc-etcd` is under the MIT license. See the LICENSE file for details.
