@@ -1,4 +1,4 @@
-# ConnectRPC Bindings for Etcd Server / Client
+# Protobuf Bindings using ConnectRPC for Etcd Client/Server
 
 The following repository contains generated protobuf files for Etcd Server using ConnectRPC.
 
@@ -7,7 +7,7 @@ The following repository contains generated protobuf files for Etcd Server using
 ### Node / JS / TS Ecosystem
 
 ```
-npm install git+https://github.com/setcd-io/connectrpc.git#etcd-3.5
+npm install git+https://github.com/setcd-io/connectrpc-etcd.git#etcd-3.5
 ```
 
 ### Golang
