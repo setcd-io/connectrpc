@@ -29,7 +29,6 @@
   },
   "homepage": "https://github.com/setcd-io/connectrpc-etcd#README.md",
   "peerDependencies": {
-    "@bufbuild/protobuf": ">= 2, < 3",
     "@connectrpc/connect": ">= 2, < 3"
   },
   "devDependencies": {
