@@ -1,7 +1,7 @@
 {
   "name": "@setcd-io/connectrpc-etcd",
   "version": "3.5.21-0",
-  "description": "Protobuf Bindings using ConnectRPC for Etcd Client/Server",
+  "description": "ConnectRPC Protobuf Bindings for Etcd Client/Server",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [

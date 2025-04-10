@@ -1,4 +1,4 @@
-# Protobuf Bindings using ConnectRPC for Etcd Client/Server
+# ConnectRPC Protobuf Bindings for Etcd Client/Server
 
 The following repository contains generated protobuf files for Etcd Server using ConnectRPC.
 
