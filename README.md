@@ -7,7 +7,7 @@ The following repository contains generated protobuf files for Etcd Server using
 ### Node / JS / TS Ecosystem
 
 ```
-npm install git+https://github.com/setcd-io/connectrpc-etcd.git#etcd-3.5
+npm install git+https://github.com/setcd-io/connectrpc-etcd.git#etcd-3.6
 ```
 
 ### Golang
@@ -31,6 +31,7 @@ Coming Soon
 ### Updating to a new version of `etcd`
 
 1. Create a new branch for the major.minor version:
+
    ```bash
    git checkout -b etcd-MAJOR.MINOR
    ```
@@ -38,11 +39,13 @@ Coming Soon
 2. Update the version in `package.json` to match `MAJOR.MINOR.PATCH`
 
 3. Run the upgrade script:
+
    ```bash
    npm run upgrade
    ```
 
 4. Build and test:
+
    ```bash
    npm run build
    ```
