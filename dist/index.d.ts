@@ -341,9 +341,10 @@ type ResponseHeader = Message<"etcdserverpb.ResponseHeader"> & {
      */
     memberId: bigint;
     /**
-     * revision is the key-value store revision when the request was applied.
+     * revision is the key-value store revision when the request was applied, and it's
+     * unset (so 0) in case of calls not interacting with key-value store.
      * For watch progress responses, the header.revision indicates progress. All future events
-     * recieved in this stream are guaranteed to have a higher revision number than the
+     * received in this stream are guaranteed to have a higher revision number than the
      * header.revision number.
      *
      * @generated from field: int64 revision = 3;
@@ -543,7 +544,9 @@ type RangeResponse = Message<"etcdserverpb.RangeResponse"> & {
      */
     more: boolean;
     /**
-     * count is set to the number of keys within the range when requested.
+     * count is set to the actual number of keys within the range when requested.
+     * Unlike Kvs, it is unaffected by limits and filters (e.g., Min/Max, Create/Modify, Revisions)
+     * and reflects the full count within the specified range.
      *
      * @generated from field: int64 count = 4;
      */
@@ -1070,6 +1073,12 @@ type HashKVResponse = Message<"etcdserverpb.HashKVResponse"> & {
      * @generated from field: int64 compact_revision = 3;
      */
     compactRevision: bigint;
+    /**
+     * hash_revision is the revision up to which the hash is calculated.
+     *
+     * @generated from field: int64 hash_revision = 4;
+     */
+    hashRevision: bigint;
 };
 /**
  * Describes the message etcdserverpb.HashKVResponse.
@@ -1128,6 +1137,14 @@ type SnapshotResponse = Message<"etcdserverpb.SnapshotResponse"> & {
      * @generated from field: bytes blob = 3;
      */
     blob: Uint8Array;
+    /**
+     * local version of server that created the snapshot.
+     * In cluster with binaries with different version, each cluster can return different result.
+     * Informs which etcd server version should be used when restoring the snapshot.
+     *
+     * @generated from field: string version = 4;
+     */
+    version: string;
 };
 /**
  * Describes the message etcdserverpb.SnapshotResponse.
@@ -1314,7 +1331,8 @@ type WatchResponse = Message<"etcdserverpb.WatchResponse"> & {
      */
     created: boolean;
     /**
-     * canceled is set to true if the response is for a cancel watch request.
+     * canceled is set to true if the response is for a cancel watch request
+     * or if the start_revision has already been compacted.
      * No further events will be sent to the canceled watcher.
      *
      * @generated from field: bool canceled = 4;
@@ -2081,6 +2099,25 @@ type DowngradeResponse = Message<"etcdserverpb.DowngradeResponse"> & {
  */
 declare const DowngradeResponseSchema: GenMessage<DowngradeResponse>;
 /**
+ * DowngradeVersionTestRequest is used for test only. The version in
+ * this request will be read as the WAL record version.If the downgrade
+ * target version is less than this version, then the downgrade(online)
+ * or migration(offline) isn't safe, so shouldn't be allowed.
+ *
+ * @generated from message etcdserverpb.DowngradeVersionTestRequest
+ */
+type DowngradeVersionTestRequest = Message<"etcdserverpb.DowngradeVersionTestRequest"> & {
+    /**
+     * @generated from field: string ver = 1;
+     */
+    ver: string;
+};
+/**
+ * Describes the message etcdserverpb.DowngradeVersionTestRequest.
+ * Use `create(DowngradeVersionTestRequestSchema)` to create a new message.
+ */
+declare const DowngradeVersionTestRequestSchema: GenMessage<DowngradeVersionTestRequest>;
+/**
  * @generated from message etcdserverpb.StatusRequest
  */
 type StatusRequest = Message<"etcdserverpb.StatusRequest"> & {};
@@ -2151,12 +2188,52 @@ type StatusResponse = Message<"etcdserverpb.StatusResponse"> & {
      * @generated from field: bool isLearner = 10;
      */
     isLearner: boolean;
+    /**
+     * storageVersion is the version of the db file. It might be updated with delay in relationship to the target cluster version.
+     *
+     * @generated from field: string storageVersion = 11;
+     */
+    storageVersion: string;
+    /**
+     * dbSizeQuota is the configured etcd storage quota in bytes (the value passed to etcd instance by flag --quota-backend-bytes)
+     *
+     * @generated from field: int64 dbSizeQuota = 12;
+     */
+    dbSizeQuota: bigint;
+    /**
+     * downgradeInfo indicates if there is downgrade process.
+     *
+     * @generated from field: etcdserverpb.DowngradeInfo downgradeInfo = 13;
+     */
+    downgradeInfo?: DowngradeInfo;
 };
 /**
  * Describes the message etcdserverpb.StatusResponse.
  * Use `create(StatusResponseSchema)` to create a new message.
  */
 declare const StatusResponseSchema: GenMessage<StatusResponse>;
+/**
+ * @generated from message etcdserverpb.DowngradeInfo
+ */
+type DowngradeInfo = Message<"etcdserverpb.DowngradeInfo"> & {
+    /**
+     * enabled indicates whether the cluster is enabled to downgrade.
+     *
+     * @generated from field: bool enabled = 1;
+     */
+    enabled: boolean;
+    /**
+     * targetVersion is the target downgrade version.
+     *
+     * @generated from field: string targetVersion = 2;
+     */
+    targetVersion: string;
+};
+/**
+ * Describes the message etcdserverpb.DowngradeInfo.
+ * Use `create(DowngradeInfoSchema)` to create a new message.
+ */
+declare const DowngradeInfoSchema: GenMessage<DowngradeInfo>;
 /**
  * @generated from message etcdserverpb.AuthEnableRequest
  */
@@ -3194,4 +3271,4 @@ declare const Auth: GenService<{
     };
 }>;
 
-export { type AlarmMember, AlarmMemberSchema, type AlarmRequest, AlarmRequestSchema, AlarmRequest_AlarmAction, AlarmRequest_AlarmActionSchema, type AlarmResponse, AlarmResponseSchema, AlarmType, AlarmTypeSchema, Auth, type AuthDisableRequest, AuthDisableRequestSchema, type AuthDisableResponse, AuthDisableResponseSchema, type AuthEnableRequest, AuthEnableRequestSchema, type AuthEnableResponse, AuthEnableResponseSchema, type AuthRoleAddRequest, AuthRoleAddRequestSchema, type AuthRoleAddResponse, AuthRoleAddResponseSchema, type AuthRoleDeleteRequest, AuthRoleDeleteRequestSchema, type AuthRoleDeleteResponse, AuthRoleDeleteResponseSchema, type AuthRoleGetRequest, AuthRoleGetRequestSchema, type AuthRoleGetResponse, AuthRoleGetResponseSchema, type AuthRoleGrantPermissionRequest, AuthRoleGrantPermissionRequestSchema, type AuthRoleGrantPermissionResponse, AuthRoleGrantPermissionResponseSchema, type AuthRoleListRequest, AuthRoleListRequestSchema, type AuthRoleListResponse, AuthRoleListResponseSchema, type AuthRoleRevokePermissionRequest, AuthRoleRevokePermissionRequestSchema, type AuthRoleRevokePermissionResponse, AuthRoleRevokePermissionResponseSchema, type AuthStatusRequest, AuthStatusRequestSchema, type AuthStatusResponse, AuthStatusResponseSchema, type AuthUserAddRequest, AuthUserAddRequestSchema, type AuthUserAddResponse, AuthUserAddResponseSchema, type AuthUserChangePasswordRequest, AuthUserChangePasswordRequestSchema, type AuthUserChangePasswordResponse, AuthUserChangePasswordResponseSchema, type AuthUserDeleteRequest, AuthUserDeleteRequestSchema, type AuthUserDeleteResponse, AuthUserDeleteResponseSchema, type AuthUserGetRequest, AuthUserGetRequestSchema, type AuthUserGetResponse, AuthUserGetResponseSchema, type AuthUserGrantRoleRequest, AuthUserGrantRoleRequestSchema, type AuthUserGrantRoleResponse, AuthUserGrantRoleResponseSchema, type AuthUserListRequest, AuthUserListRequestSchema, type AuthUserListResponse, AuthUserListResponseSchema, type AuthUserRevokeRoleRequest, AuthUserRevokeRoleRequestSchema, type AuthUserRevokeRoleResponse, AuthUserRevokeRoleResponseSchema, type AuthenticateRequest, AuthenticateRequestSchema, type AuthenticateResponse, AuthenticateResponseSchema, Cluster, type CompactionRequest, CompactionRequestSchema, type CompactionResponse, CompactionResponseSchema, type Compare, CompareSchema, Compare_CompareResult, Compare_CompareResultSchema, Compare_CompareTarget, Compare_CompareTargetSchema, type DefragmentRequest, DefragmentRequestSchema, type DefragmentResponse, DefragmentResponseSchema, type DeleteRangeRequest, DeleteRangeRequestSchema, type DeleteRangeResponse, DeleteRangeResponseSchema, type DowngradeRequest, DowngradeRequestSchema, DowngradeRequest_DowngradeAction, DowngradeRequest_DowngradeActionSchema, type DowngradeResponse, DowngradeResponseSchema, type Event, EventSchema, Event_EventType, Event_EventTypeSchema, type HashKVRequest, HashKVRequestSchema, type HashKVResponse, HashKVResponseSchema, type HashRequest, HashRequestSchema, type HashResponse, HashResponseSchema, KV, type KeyValue, KeyValueSchema, Lease, type LeaseCheckpoint, type LeaseCheckpointRequest, LeaseCheckpointRequestSchema, type LeaseCheckpointResponse, LeaseCheckpointResponseSchema, LeaseCheckpointSchema, type LeaseGrantRequest, LeaseGrantRequestSchema, type LeaseGrantResponse, LeaseGrantResponseSchema, type LeaseKeepAliveRequest, LeaseKeepAliveRequestSchema, type LeaseKeepAliveResponse, LeaseKeepAliveResponseSchema, type LeaseLeasesRequest, LeaseLeasesRequestSchema, type LeaseLeasesResponse, LeaseLeasesResponseSchema, type LeaseRevokeRequest, LeaseRevokeRequestSchema, type LeaseRevokeResponse, LeaseRevokeResponseSchema, type LeaseStatus, LeaseStatusSchema, type LeaseTimeToLiveRequest, LeaseTimeToLiveRequestSchema, type LeaseTimeToLiveResponse, LeaseTimeToLiveResponseSchema, Maintenance, type Member, type MemberAddRequest, MemberAddRequestSchema, type MemberAddResponse, MemberAddResponseSchema, type MemberListRequest, MemberListRequestSchema, type MemberListResponse, MemberListResponseSchema, type MemberPromoteRequest, MemberPromoteRequestSchema, type MemberPromoteResponse, MemberPromoteResponseSchema, type MemberRemoveRequest, MemberRemoveRequestSchema, type MemberRemoveResponse, MemberRemoveResponseSchema, MemberSchema, type MemberUpdateRequest, MemberUpdateRequestSchema, type MemberUpdateResponse, MemberUpdateResponseSchema, type Metadata, MetadataSchema, type MoveLeaderRequest, MoveLeaderRequestSchema, type MoveLeaderResponse, MoveLeaderResponseSchema, type Permission, PermissionSchema, Permission_Type, Permission_TypeSchema, type PutRequest, PutRequestSchema, type PutResponse, PutResponseSchema, type RangeRequest, RangeRequestSchema, RangeRequest_SortOrder, RangeRequest_SortOrderSchema, RangeRequest_SortTarget, RangeRequest_SortTargetSchema, type RangeResponse, RangeResponseSchema, type Request, type RequestOp, RequestOpSchema, RequestSchema, type ResponseHeader, ResponseHeaderSchema, type ResponseOp, ResponseOpSchema, type Role, RoleSchema, type SnapshotRequest, SnapshotRequestSchema, type SnapshotResponse, SnapshotResponseSchema, type StatusRequest, StatusRequestSchema, type StatusResponse, StatusResponseSchema, type TxnRequest, TxnRequestSchema, type TxnResponse, TxnResponseSchema, type User, type UserAddOptions, UserAddOptionsSchema, UserSchema, Watch, type WatchCancelRequest, WatchCancelRequestSchema, type WatchCreateRequest, WatchCreateRequestSchema, WatchCreateRequest_FilterType, WatchCreateRequest_FilterTypeSchema, type WatchProgressRequest, WatchProgressRequestSchema, type WatchRequest, WatchRequestSchema, type WatchResponse, WatchResponseSchema, file_etcd_api_authpb_auth, file_etcd_api_etcdserverpb_etcdserver, file_etcd_api_etcdserverpb_rpc, file_etcd_api_mvccpb_kv };
+export { type AlarmMember, AlarmMemberSchema, type AlarmRequest, AlarmRequestSchema, AlarmRequest_AlarmAction, AlarmRequest_AlarmActionSchema, type AlarmResponse, AlarmResponseSchema, AlarmType, AlarmTypeSchema, Auth, type AuthDisableRequest, AuthDisableRequestSchema, type AuthDisableResponse, AuthDisableResponseSchema, type AuthEnableRequest, AuthEnableRequestSchema, type AuthEnableResponse, AuthEnableResponseSchema, type AuthRoleAddRequest, AuthRoleAddRequestSchema, type AuthRoleAddResponse, AuthRoleAddResponseSchema, type AuthRoleDeleteRequest, AuthRoleDeleteRequestSchema, type AuthRoleDeleteResponse, AuthRoleDeleteResponseSchema, type AuthRoleGetRequest, AuthRoleGetRequestSchema, type AuthRoleGetResponse, AuthRoleGetResponseSchema, type AuthRoleGrantPermissionRequest, AuthRoleGrantPermissionRequestSchema, type AuthRoleGrantPermissionResponse, AuthRoleGrantPermissionResponseSchema, type AuthRoleListRequest, AuthRoleListRequestSchema, type AuthRoleListResponse, AuthRoleListResponseSchema, type AuthRoleRevokePermissionRequest, AuthRoleRevokePermissionRequestSchema, type AuthRoleRevokePermissionResponse, AuthRoleRevokePermissionResponseSchema, type AuthStatusRequest, AuthStatusRequestSchema, type AuthStatusResponse, AuthStatusResponseSchema, type AuthUserAddRequest, AuthUserAddRequestSchema, type AuthUserAddResponse, AuthUserAddResponseSchema, type AuthUserChangePasswordRequest, AuthUserChangePasswordRequestSchema, type AuthUserChangePasswordResponse, AuthUserChangePasswordResponseSchema, type AuthUserDeleteRequest, AuthUserDeleteRequestSchema, type AuthUserDeleteResponse, AuthUserDeleteResponseSchema, type AuthUserGetRequest, AuthUserGetRequestSchema, type AuthUserGetResponse, AuthUserGetResponseSchema, type AuthUserGrantRoleRequest, AuthUserGrantRoleRequestSchema, type AuthUserGrantRoleResponse, AuthUserGrantRoleResponseSchema, type AuthUserListRequest, AuthUserListRequestSchema, type AuthUserListResponse, AuthUserListResponseSchema, type AuthUserRevokeRoleRequest, AuthUserRevokeRoleRequestSchema, type AuthUserRevokeRoleResponse, AuthUserRevokeRoleResponseSchema, type AuthenticateRequest, AuthenticateRequestSchema, type AuthenticateResponse, AuthenticateResponseSchema, Cluster, type CompactionRequest, CompactionRequestSchema, type CompactionResponse, CompactionResponseSchema, type Compare, CompareSchema, Compare_CompareResult, Compare_CompareResultSchema, Compare_CompareTarget, Compare_CompareTargetSchema, type DefragmentRequest, DefragmentRequestSchema, type DefragmentResponse, DefragmentResponseSchema, type DeleteRangeRequest, DeleteRangeRequestSchema, type DeleteRangeResponse, DeleteRangeResponseSchema, type DowngradeInfo, DowngradeInfoSchema, type DowngradeRequest, DowngradeRequestSchema, DowngradeRequest_DowngradeAction, DowngradeRequest_DowngradeActionSchema, type DowngradeResponse, DowngradeResponseSchema, type DowngradeVersionTestRequest, DowngradeVersionTestRequestSchema, type Event, EventSchema, Event_EventType, Event_EventTypeSchema, type HashKVRequest, HashKVRequestSchema, type HashKVResponse, HashKVResponseSchema, type HashRequest, HashRequestSchema, type HashResponse, HashResponseSchema, KV, type KeyValue, KeyValueSchema, Lease, type LeaseCheckpoint, type LeaseCheckpointRequest, LeaseCheckpointRequestSchema, type LeaseCheckpointResponse, LeaseCheckpointResponseSchema, LeaseCheckpointSchema, type LeaseGrantRequest, LeaseGrantRequestSchema, type LeaseGrantResponse, LeaseGrantResponseSchema, type LeaseKeepAliveRequest, LeaseKeepAliveRequestSchema, type LeaseKeepAliveResponse, LeaseKeepAliveResponseSchema, type LeaseLeasesRequest, LeaseLeasesRequestSchema, type LeaseLeasesResponse, LeaseLeasesResponseSchema, type LeaseRevokeRequest, LeaseRevokeRequestSchema, type LeaseRevokeResponse, LeaseRevokeResponseSchema, type LeaseStatus, LeaseStatusSchema, type LeaseTimeToLiveRequest, LeaseTimeToLiveRequestSchema, type LeaseTimeToLiveResponse, LeaseTimeToLiveResponseSchema, Maintenance, type Member, type MemberAddRequest, MemberAddRequestSchema, type MemberAddResponse, MemberAddResponseSchema, type MemberListRequest, MemberListRequestSchema, type MemberListResponse, MemberListResponseSchema, type MemberPromoteRequest, MemberPromoteRequestSchema, type MemberPromoteResponse, MemberPromoteResponseSchema, type MemberRemoveRequest, MemberRemoveRequestSchema, type MemberRemoveResponse, MemberRemoveResponseSchema, MemberSchema, type MemberUpdateRequest, MemberUpdateRequestSchema, type MemberUpdateResponse, MemberUpdateResponseSchema, type Metadata, MetadataSchema, type MoveLeaderRequest, MoveLeaderRequestSchema, type MoveLeaderResponse, MoveLeaderResponseSchema, type Permission, PermissionSchema, Permission_Type, Permission_TypeSchema, type PutRequest, PutRequestSchema, type PutResponse, PutResponseSchema, type RangeRequest, RangeRequestSchema, RangeRequest_SortOrder, RangeRequest_SortOrderSchema, RangeRequest_SortTarget, RangeRequest_SortTargetSchema, type RangeResponse, RangeResponseSchema, type Request, type RequestOp, RequestOpSchema, RequestSchema, type ResponseHeader, ResponseHeaderSchema, type ResponseOp, ResponseOpSchema, type Role, RoleSchema, type SnapshotRequest, SnapshotRequestSchema, type SnapshotResponse, SnapshotResponseSchema, type StatusRequest, StatusRequestSchema, type StatusResponse, StatusResponseSchema, type TxnRequest, TxnRequestSchema, type TxnResponse, TxnResponseSchema, type User, type UserAddOptions, UserAddOptionsSchema, UserSchema, Watch, type WatchCancelRequest, WatchCancelRequestSchema, type WatchCreateRequest, WatchCreateRequestSchema, WatchCreateRequest_FilterType, WatchCreateRequest_FilterTypeSchema, type WatchProgressRequest, WatchProgressRequestSchema, type WatchRequest, WatchRequestSchema, type WatchResponse, WatchResponseSchema, file_etcd_api_authpb_auth, file_etcd_api_etcdserverpb_etcdserver, file_etcd_api_etcdserverpb_rpc, file_etcd_api_mvccpb_kv };

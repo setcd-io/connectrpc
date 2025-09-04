@@ -1,4 +1,4 @@
 [submodule "etcd"]
 	path = etcd
 	url = https://github.com/etcd-io/etcd.git
-	branch = release-3.5
+	tag = v3.5.21

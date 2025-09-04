@@ -6,6 +6,7 @@ modules:
       - etcd/api/etcdserverpb/
       - etcd/api/membershippb/
       - etcd/api/mvccpb/
+      - etcd/api/versionpb/
 lint:
   use:
     - STANDARD
