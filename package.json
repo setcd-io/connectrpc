@@ -1,6 +1,6 @@
 {
   "name": "@setcd-io/connectrpc-etcd",
-  "version": "3.5.21",
+  "version": "3.6.4",
   "description": "ConnectRPC Protobuf Bindings for Etcd Client/Server",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -14,6 +14,7 @@
   },
   "scripts": {
     "prepare": "husky",
+    "upgrade": "VERSION=$(node -p 'require(\"./package.json\").version') && git config -f .gitmodules submodule.etcd.tag v$VERSION && git submodule update --init && cd etcd && git fetch && git checkout v$VERSION",
     "build:proto": "buf generate --exclude-path etcd/api/etcdserverpb/raft_internal.proto",
     "build:index": "tsup src/index.ts --dts --sourcemap inline",
     "build": "npm run build:proto && npm run build:index"

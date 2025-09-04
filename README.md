@@ -30,22 +30,28 @@ Coming Soon
 
 ### Updating to a new version of `etcd`
 
-1. Run the following commands:
-
+1. Create a new branch for the major.minor version:
    ```bash
-   git submodule deinit --all --force
-   rm -rf .git/modules
-   rm -fr etcd
-   git clean -fdx
-   git reset --hard
-   git submodule update --init --recursive
-   cd etcd
-   git fetch --tags
-   git checkout tags/v3.5.21
-   cd ..
+   git checkout -b etcd-MAJOR.MINOR
+   ```
+
+2. Update the version in `package.json` to match `MAJOR.MINOR.PATCH`
+
+3. Run the upgrade script:
+   ```bash
+   npm run upgrade
+   ```
+
+4. Build and test:
+   ```bash
+   npm run build
+   ```
+
+5. Commit and push:
+   ```bash
    git add .
-   git commit -m "Update to etcd v3.5.21"
-   git push
+   git commit -m "Update to etcd vMAJOR.MINOR.PATCH"
+   git push -u origin etcd-MAJOR.MINOR
    ```
 
 # License
